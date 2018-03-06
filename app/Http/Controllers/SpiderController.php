@@ -27,6 +27,58 @@ class SpiderController extends Controller
         }
     }
 
+    public function getLink()
+    {
+        $totalPage = 75489;
+        $link = 'http://masocongty.vn/search?name=&by=&pro=0&page=';
+        $page = new Page();
+        $i = 0;
+        try {
+            for ($i; $i <= 1999; $i++) {
+                sleep(2);
+                $page->visit($link . $i);
+                $dom = $page->all('div.listview-outlook > a');
+
+                foreach ($dom as $x => $item) {
+                    DB::table('topcv_links')->insert([
+                        'link' => $item->attribute('href'),
+                    ]);
+                    echo "Insert success " . $x . "\n";
+                }
+                echo "-----------------Insert success trang " . $i . "\n";
+            }
+        } catch (\Exception $e) {
+            echo "Loi: " . $e . "\n";
+            echo "Lay thanh cong den trang: " . $i . "\n";
+        }
+    }
+
+    public function getContentTopcv()
+    {
+        $link = 'https://www.topcv.vn/cong-ty/fpt-software/3.html';
+        $page = new Page();
+        $page->visit($link);
+
+        $tencongty = $page->find('.company-name');
+        $diachi = $page->find('div.col-md-4 div:nth-child(4) p');
+        $gioithieu = $page->find('.text-dark-gray');
+        $sdt = $page->all('.company-overview .detail-item');
+        $sonv = $page->find('div.company-overview');
+        $thumb = $page->find('div.company-avatar a img');
+        dd($sdt);
+        foreach ($sdt as $item) {
+            $item->html();
+        }
+        die;
+
+        echo "Ten cong ty: " . $tencongty->text() . "</br>";
+        echo "Dia chi: " . $diachi->text() . "</br>";
+        echo "Gioi thieu: " . $gioithieu->text() . "</br>";
+        echo "So dien thoai: " . $sdt->text() . "</br>";
+        echo "So nhan vien: " . $sonv->text() . "</br>";
+        echo "Avatar: " . $thumb->attribute('src') . "</br>";
+    }
+
     public function show()
     {
         $page = new Page();
@@ -66,37 +118,23 @@ class SpiderController extends Controller
         //$dom2 = $page->find('h1');
         //dump($dom2->text());
 
-        $data = file_get_html('https://thongtindoanhnghiep.co/0312477581-cong-ty-tnhh-my-pham-sang-hong-nhat-nhat');
+        $data = file_get_html('https://thongtindoanhnghiep.co/0100102608-011-cn-tan-duong-cua-tong-cty-lt-mien-bac-tai-tinh-dong-thap');
         $masothue = $data->find('h3 a strong');
         $ngaycap = $data->find('tbody tr:nth-child(1) td');
         $title = $data->find('h1');
         $diachicongty = $data->find('tr:nth-child(4) td[colspan=5] h3');
+        $tinhthanhtitle = trim($diachicongty[0]->plaintext);
+        preg_match_all('/(.[^\-]*?)$/miu', $tinhthanhtitle, $tinhthanh);
         $nganhnghetitle = $data->find('table:nth-child(3) tbody tr:nth-child(15) td a');
-        foreach ($masothue as $item) {
-            //echo "Ma so thue: " . $item->plaintext . "</br>";
-        }
-        foreach ($ngaycap as $i => $item) {
-            if ($i == 1) {
-                echo "Ngay cap: " . $item->plaintext . "</br>";
-            }
-        }
-        foreach ($diachicongty as $item) {
-            echo "Dia chi cong ty: " . $item->plaintext . "</br>";
-            $hihi = trim($item->plaintext);
-            preg_match_all('/(.[^\-]*?)$/miu', $hihi, $tinhthanh);
-
-            echo "Tinh thanh: " . str_replace('-', '', implode('', $tinhthanh[0])) . "</br>";
-        }
-        foreach ($nganhnghetitle as $i => $item) {
-            if ($i == 3) {
-                echo "Nganh nghe title: " . $item->plaintext . "</br>";
-            }
-        }
-        foreach ($title as $item) {
-            echo "Title: " . $item->plaintext . "</br>";
-        }
+        echo "Ma so thue: " . $masothue[0]->plaintext . "</br>";
+        echo "Ngay cap: " . $ngaycap[1]->plaintext . "</br>";
+        echo "Title: " . $title[0]->plaintext . "</br>";
+        echo "Dia chi cong ty: " . $diachicongty[0]->plaintext . "</br>";
+        echo "Tinh thanh: " . str_replace('-', '', implode('', $tinhthanh[0])) . "</br>";
+        echo "Nganh nghe title: " . $nganhnghetitle[2]->plaintext . "</br>";
 
 
     }
+
 
 }

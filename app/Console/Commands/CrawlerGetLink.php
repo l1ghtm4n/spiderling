@@ -44,8 +44,8 @@ class CrawlerGetLink extends Command
         $page = new Page();
         $i = $this->argument('num');
         try {
-            for ($i; $i <= 2999; $i++) {
-                $page->visit($link . $i)->wait(1000);
+            for ($i; $i <= 70000; $i++) {
+                $page->visit($link . $i)->wait(2000);
                 $dom = $page->all('div.listview-outlook > a');
 
                 foreach ($dom as $x => $item) {
@@ -54,7 +54,7 @@ class CrawlerGetLink extends Command
                     ]);
                     echo "Insert success " . $x . "\n";
                 }
-                echo "-----------------Insert success trang " . $i . "\n";
+                echo "-------Xong trang " . $i . "\n";
             }
         } catch (\Exception $e) {
             echo "Lay loi o trang: " . $i . "\n";

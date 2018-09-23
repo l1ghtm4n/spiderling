@@ -56,10 +56,10 @@ class Crawler
                     'browserName'    => 'chrome',
                     'acceptSslCerts' => true,
                     "chromeOptions"  => [
-                        "args" => [
-                            '--disable-gpu',
-                            '--headless',
-                        ],
+                        //    "args" => [
+                        //        '--disable-gpu',
+                        //        '--headless',
+                        //    ],
                     ],
                 ]);
                 try {
@@ -78,27 +78,163 @@ class Crawler
 
         return $page;
     }
+
     /**
      * Login crawler
      */
-    public function crawlerLogin(){
-        $this->visit("https://www.topcv.vn/login", [], 2);
-        $this->client->find('input[name="email"]')->set('familymaokhe@gmail.com');
-        $this->client->find('input[name="password"]')->set('huongmk1234');
+    public function crawlerLogin()
+    {
+        $this->visit("https://www.facebook.com/", [], 2);
+        $this->client->find('input[name="email"]')->set('123job.vn@gmail.com');
+        $this->client->find('input[name="pass"]')->set('123job.vn');
         $this->client->find('input[type="submit"]')->click();
 
         echo "\nDang nhap thanh cong\n";
     }
+
     /**
      * Run crawler
      */
-    public function crawler($num_skip)
+    public function crawler()
+    {
+        dd('oke');
+
+        set_time_limit(10000);
+        $info = [];
+        $this->visit('https://www.facebook.com/groups/432148227163824/', [], 2);
+        $this->el(['xpath', '//a[@class="_2yau"]/span[contains(text(),"Thảo luận")]'])->click();
+
+        //$node = $this->els(['xpath', '//*[@class="text_exposed_root"]/p']);
+        //$post = $this->els(['xpath', '//div[@class="text_exposed_root"]']);
+        //$author = $this->els(['xpath', '//h5/span[@class="fwn fcg"]/span[@class="fwb fcg"]/span']);
+        //$parents = $this->els(['xpath', '//div[@class="_5pcr userContentWrapper"]']);
+        $parents = $this->els(['xpath', '//div[@id="pagelet_group_mall"]//div[@class="_5pcb"]/div[@class="_4-u2 mbm _4mrt _5jmm _5pat _5v3q _4-u8"]']);
+
+        //Get nội dung khi chưa đăng nhập
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//h5/span[@class="fwn fcg"]/span[@class="fwb fcg"]/span'])->text();
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//span[@class="timestampContent"]'])->text();
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//div[@class="text_exposed_root"]'])->html();
+
+        //Get nội dung khi đã đăng nhập
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//h5/span[@class="fwn fcg"]/span[@class="fwb fcg"]'])->text();
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//span[@class="timestampContent"]'])->text();
+        //dump('--------------------------------------');
+        //echo $parents->find(['xpath', '//div[@class="text_exposed_root"]'])->html();
+
+        foreach ($parents as $i => $item) {
+            try {
+
+                //Get nội dung khi đã đăng nhập
+                echo 'Người đăng: ' . $item->find(['xpath', '//h5/span[@class="fwn fcg"]/span[@class="fwb fcg"]'])->text() ."<br/>";
+                echo 'Ảnh đại diện: '. $item->find(['xpath', '//div[@class="_38vo"]/img'])->attribute('src') . "<br/>";
+                echo $item->find(['xpath', '//div[contains(@class, "userContent")]//div[contains(@class, "userContent")]'])->html();
+                dump('--------------------------------------');
+            } catch (\Exception $exception) {
+                echo 'Lỗi tại ' . $i ."<br/>";
+                dump('--------------------------------------');
+            }
+        }
+
+        die;
+
+        echo 'Tong so post ' . count($post);
+        dump('--------------------------------------');
+        foreach ($post as $item) {
+            echo $item->html();
+            dump('--------------------------------------');
+        }
+
+        echo 'Tong so tac gia ' . count($author);
+        dump('--------------------------------------');
+        foreach ($author as $item) {
+            echo $item->text();
+            dump('--------------------------------------');
+        }
+        die;
+        dd($node->text());
+        //$selectors = [
+        //    [
+        //        'field'    => 'page_name',
+        //        'selector' => '//*[@id="seo_h1_tag"]',
+        //    ],
+        //    [
+        //        'field'    => 'poster_name',
+        //        'selector' => '//*[@id="js_xe"]',
+        //    ],
+        //    [
+        //        'field'   => 'num_member',
+        //        'selector' => '//*[@id="id_5ae2e8ed8a13b2684917675"]/p',
+        //    ],
+        //    [
+        //        'field'    => 'thumb',
+        //        'selector' => '//*[@id="company-title"]/div[1]/a/img',
+        //    ],
+        //];
+        //
+        //foreach ($selectors as $key => $item) {
+        //    if ($item['multiple'] == true) {
+        //        $node = $this->els(['xpath', $item['selector']]);
+        //    }
+        //    else {
+        //        $node = [$this->el(['xpath', $item['selector']])];
+        //    }
+        //
+        //    foreach ($node as $mynode) {
+        //        if ($mynode) {
+        //            if (isset($item['type']) && $item['type'] == 'src') {
+        //                $info[$item['field']] = $mynode->attribute('src');
+        //            }
+        //            else if ($item['multiple'] == true) {
+        //                if (count($node) == 2) {
+        //                    $info[$item['field0']] = $node[0]->text();
+        //                    if (strpos($node[1]->text(), 'http') !== false || strpos($node[1]->text(), 'www') !== false) {
+        //                        $info[$item['field1']] = $node[1]->text();
+        //                    }
+        //                    else {
+        //                        $info[$item['field2']] = $node[1]->text();
+        //                    }
+        //                    break;
+        //                }
+        //                else if (count($node) == 3) {
+        //                    $info[$item['field0']] = $node[0]->text();
+        //                    $info[$item['field1']] = $node[1]->text();
+        //                    $info[$item['field2']] = $node[2]->text();
+        //                    break;
+        //                }
+        //                else {
+        //                    $info[$item['field1']] = $node[0]->text();
+        //                }
+        //            }
+        //            else {
+        //                if ($item['field'] == 'about') {
+        //                    $info[$item['field']] = $mynode->html();
+        //                }
+        //                else {
+        //                    $info[$item['field']] = $mynode->text();
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        //$sl++;
+        //echo "Lay du lieu thanh cong id " . $val->id . "\n";
+    }
+
+    public function crawlerTopCV()
     {
         set_time_limit(10000);
+        $this->visit('https://www.facebook.com/groups/timvieclam20/', [], 2);
+        $node = [$this->el(['xpath', '//*[@id="seo_h1_tag"]'])];
+        dd($node[0]->text());
 
         $topcv = \DB::table('topcv_links')->skip($num_skip)->take(1000)->get();
         $sl = 0;
-        try{
+        try {
             foreach ($topcv as $i => $val) {
                 $info = [];
                 $this->visit($val->link, [], 2);
@@ -188,10 +324,9 @@ class Crawler
                 $sl++;
                 echo "Lay du lieu thanh cong id " . $val->id . "\n";
             }
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             echo "Mat ket noi toi phantomJS\n";
-            echo "Tong so ban ghi clone: ".$sl;
+            echo "Tong so ban ghi clone: " . $sl;
         }
     }
 

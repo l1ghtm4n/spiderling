@@ -44,9 +44,14 @@ class CrawlerLogin extends Command
                 'name'   => 'phantomjs',
                 'server' => env('PHANTOM_TEST_SERVER', 'http://localhost'),
                 'port'   => env('PHANTOM_TEST_PORT', 4445)
-            ]
+            ],
+            'selenium' => [
+                'name'   => 'selenium',
+                'server' => 'http://127.0.0.1:4444/wd/hub/',
+                'engine' => 'phantomjs',
+            ],
         ];
-        $crawler = new \App\SmallCrawler\Crawler($driver['phantomjs']);
+        $crawler = new \App\SmallCrawler\Crawler($driver['selenium']);
 
         $crawler->crawlerLogin();
         //echo "</div>";
